@@ -32,6 +32,17 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/feature/')
         working-directory: Env/Dev
         run: terraform init
+      
+      - name: Terraform fmt (Feature)
+        if: startsWith(github.ref, 'refs/heads/feature/')
+        working-directory: Env/Dev
+        run: terraform fmt
+
+
+      - name: Terraform validate (Feature)
+        if: startsWith(github.ref, 'refs/heads/feature/')
+        working-directory: Env/Dev
+        run: terraform validate
 
       - name: Terraform Plan (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
