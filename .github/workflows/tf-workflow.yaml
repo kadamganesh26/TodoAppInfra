@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - master
       - 'feature/*'
 
 jobs:
@@ -12,29 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repo
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.5
 
+      # Login to Azure using single secret
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Terraform Init
-        working-directory: TodoAppInfra/Env/Dev
+      # -------- Feature Branch (Plan Only) --------
+      - name: Terraform Init (Feature)
+        if: startsWith(github.ref, 'refs/heads/feature/')
+        working-directory: Env/Dev
         run: terraform init
 
-      - name: Terraform Plan
+      - name: Terraform Plan (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: TodoAppInfra/Env/Dev
+        working-directory: Env/Dev
         run: terraform plan -out=tfplan
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        working-directory: TodoAppInfra/Env/Dev
-        run: terraform apply -auto-approve
+      # # -------- Main Branch (Apply to Prod Env) --------
+      # - name: Terraform Init (Main)
+      #   if: github.ref == 'refs/heads/main'
+      #   working-directory: Env/Prod
+      #   run: terraform init
+
+      # - name: Terraform Apply (Main)
+      #   if: github.ref == 'refs/heads/main'
+      #   working-directory: Env/Prod
+      #   run: terraform apply -auto-approve
