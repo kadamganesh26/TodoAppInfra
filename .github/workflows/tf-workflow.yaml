@@ -1,20 +1,20 @@
-name: Terraform Workflow
+name: Terraform CI/CD
 
 on:
   push:
     branches:
-      - 'feature/*'
       - main
   pull_request:
     branches:
       - main
-      
+
 jobs:
-  terraform_plan:
-    runs-on: self-hosted
-    if: startsWith(github.ref, 'refs/heads/feature/')
+  terraform_fmt_validate_plan:
+    name: Terraform Fmt, Validate & Plan (Feature)
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'feature/') || startsWith(github.ref, 'refs/heads/feature/')
     steps:
-      - name: Checkout repo
+      - name: Checkout Repo
         uses: actions/checkout@v3
 
       - name: Setup Terraform
@@ -22,32 +22,32 @@ jobs:
         with:
           terraform_version: 1.7.5
 
-      - name: Azure Login 
-        uses: azure/login@v2 
-        with: 
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Terraform fmt (Dev)
+      - name: Terraform Fmt
         working-directory: ./Env/Dev
-        run: terraform fmt  
+        run: terraform fmt -check
 
-      - name: Terraform validate (Dev)
+      - name: Terraform Validate
         working-directory: ./Env/Dev
         run: terraform validate
 
-      - name: Terraform Plan (Dev)
+      - name: Terraform Init
+        working-directory: ./Env/Dev
+        run: terraform init
+
+      - name: Terraform Plan
         working-directory: ./Env/Dev
         run: terraform plan
 
-
-  apply-prod:
+  terraform_apply_prod:
+    name: Terraform Apply (Prod)
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: terraform_plan
+    # Ye sirf tab chalega jab main pe push hoga (PR merge hone ke baad)
+    if: github.ref == 'refs/heads/main'
+    needs: terraform_fmt_validate_plan
     environment:
       name: prod
     steps:
-      - name: Checkout
+      - name: Checkout Repo
         uses: actions/checkout@v3
 
       - name: Setup Terraform
@@ -55,9 +55,9 @@ jobs:
         with:
           terraform_version: 1.7.5
 
-      - name: Azure Login 
-        uses: azure/login@v2 
-        with: 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Terraform Init (Prod)
