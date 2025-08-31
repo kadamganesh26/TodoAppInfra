@@ -49,13 +49,13 @@ jobs:
         working-directory: Env/Dev
         run: terraform plan -out=tfplan
 
-      # # -------- Main Branch (Apply to Prod Env) --------
-      # - name: Terraform Init (Main)
-      #   if: github.ref == 'refs/heads/main'
-      #   working-directory: Env/Prod
-      #   run: terraform init
+      # -------- Main Branch (Apply to Prod Env) --------
+      - name: Terraform Init (Main)
+        if: github.ref == 'refs/heads/main'
+        working-directory: Env/Prod
+        run: terraform init
 
-      # - name: Terraform Apply (Main)
-      #   if: github.ref == 'refs/heads/main'
-      #   working-directory: Env/Prod
-      #   run: terraform apply -auto-approve
+      - name: Terraform Apply (Main)
+        if: github.ref == 'refs/heads/main'
+        working-directory: Env/Prod
+        run: terraform apply -auto-approve
