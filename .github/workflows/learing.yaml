@@ -1,0 +1,20 @@
+name: "learning-workflow" 
+
+on: 
+  push:  
+    branches:
+      - 'feature/**'
+      - main
+jobs:
+  Terraform_Install:
+    name: Install Terraform
+    runs-on: X64
+    steps:
+    - name: test1
+      run: echo test1 ganesh_kadam 
+
+    - name: test2
+      run: echo test2 ganesh_kadam 
+    
+    
+      
