@@ -50,10 +50,10 @@ jobs:
   # Step2: After PR Approval & Merge → Apply in Prod
   apply-prod:
     runs-on: ubuntu-latest
-    if: github.ref_name == 'main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event.pull_request.merged == true
     needs: terraform_plan
     environment:
-      name: prod   # Yehi environment approval lagata hai
+      name: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v3
