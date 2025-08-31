@@ -33,31 +33,31 @@ jobs:
       # -------- Feature Branch (Plan Only) --------
       - name: Terraform Init (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: /Env/Dev
+        working-directory: Env/Dev
         run: terraform init
       
       - name: Terraform fmt (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: /Env/Dev
+        working-directory: Env/Dev
         run: terraform fmt
 
       - name: Terraform validate (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: /Env/Dev
+        working-directory: Env/Dev
         run: terraform validate
 
       - name: Terraform Plan (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: /Env/Dev
+        working-directory: Env/Dev
         run: terraform plan -out=tfplan
 
       # -------- Main Branch (Apply to Prod Env) --------
       - name: Terraform Init (Main)
         if: github.ref == 'refs/heads/main'
-        working-directory: /Env/Prod
+        working-directory: Env/Prod
         run: terraform init
 
       - name: Terraform Apply (Main)
         if: github.ref == 'refs/heads/main'
-        working-directory: /Env/Prod
+        working-directory: Env/Prod
         run: terraform apply -auto-approve
