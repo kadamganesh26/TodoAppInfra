@@ -60,6 +60,7 @@ jobs:
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+
       - name: Terraform Init (Prod)
         working-directory: ./Env/Prod
         run: terraform init
