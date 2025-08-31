@@ -1,7 +1,11 @@
-name: Terraform Pipeline
+name: Terraform Workflow
 
 on:
   push:
+    branches:
+      - main
+      - 'feature/*'
+  pull_request:
     branches:
       - main
       - 'feature/*'
@@ -11,53 +15,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.9.5
+          terraform_version: 1.7.5   # apni version set kar lena
 
-      # Login to Azure using single secret
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      # -------Current Code Directory -----------
-      - name: Check current directory
-        run: pwd && ls -R
-
-      # -------- Feature Branch (Plan Only) --------
-      - name: Terraform Init (Feature)
+      # Dev Environment for feature branches
+      - name: Terraform Init (Dev)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: Env/Dev
-        run: terraform init
-      
-      - name: Terraform fmt (Feature)
-        if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: Env/Dev
-        run: terraform fmt
-
-      - name: Terraform validate (Feature)
-        if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: Env/Dev
-        run: terraform validate
-
-      - name: Terraform Plan (Feature)
-        if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: Env/Dev
-        run: terraform plan -out=tfplan
-
-      # -------- Main Branch (Apply to Prod Env) --------
-      - name: Terraform Init (Main)
-        if: github.ref == 'refs/heads/main'
-        working-directory: Env/Prod
+        working-directory: ./Env/Dev
         run: terraform init
 
-      - name: Terraform Apply (Main)
+      - name: Terraform Plan (Dev)
+        if: startsWith(github.ref, 'refs/heads/feature/')
+        working-directory: ./Env/Dev
+        run: terraform plan
+
+      # Prod Environment for main branch
+      - name: Terraform Init (Prod)
         if: github.ref == 'refs/heads/main'
-        working-directory: Env/Prod
-        run: terraform apply -auto-approve
+        working-directory: ./Env/Prod
+        run: terraform init
+
+      - name: Terraform Plan (Prod)
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./Env/Prod
+        run: terraform plan
