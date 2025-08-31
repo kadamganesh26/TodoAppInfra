@@ -1,9 +1,9 @@
-name: "todo-app-infra" 
+name: "learning-workflow" 
 
 on: 
   push:  
     branches:
-      - 'releases/**'
+      - 'feature/**'
       - main
 jobs:
   Terraform_Install:
