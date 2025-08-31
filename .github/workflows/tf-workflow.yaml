@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - 'feature/*'
-## need to verify the feature ke changes main mai move hore kay 
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
