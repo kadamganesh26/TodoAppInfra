@@ -10,8 +10,11 @@ jobs:
     name: Install Terraform
     runs-on: X64
     steps:
-    - name: Installinstall
-      run: echo ganesh_kadam 
+    - name: test1
+      run: echo test1 ganesh_kadam 
+
+    - name: test2
+      run: echo test2 ganesh_kadam 
     
     
       
