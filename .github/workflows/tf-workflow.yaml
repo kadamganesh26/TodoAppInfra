@@ -9,8 +9,9 @@ on:
       - main
       
 jobs:
-  terraform:
+  terraform_plan:
     runs-on: self-hosted
+    
 
     steps:
       - name: Checkout repo
@@ -49,6 +50,7 @@ jobs:
   apply-prod:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    needs: terraform_plan
     steps:
       - name: Checkout
         uses: actions/checkout@v3
