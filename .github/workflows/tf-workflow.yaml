@@ -33,22 +33,22 @@ jobs:
       # -------- Feature Branch (Plan Only) --------
       - name: Terraform Init (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: TodoAppInfra/Env/Dev
+        working-directory: /TodoAppInfra/TodoAppInfra/Env/Dev
         run: terraform init
       
       - name: Terraform fmt (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: TodoAppInfra/Env/Dev
+        working-directory: /TodoAppInfra/TodoAppInfra/Env/Dev
         run: terraform fmt
 
       - name: Terraform validate (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: TodoAppInfra/Env/Dev
+        working-directory: /TodoAppInfra/TodoAppInfra/Env/Dev
         run: terraform validate
 
       - name: Terraform Plan (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
-        working-directory: TodoAppInfra/Env/Dev
+        working-directory: /TodoAppInfra/TodoAppInfra/Env/Dev
         run: terraform plan -out=tfplan
 
       # -------- Main Branch (Apply to Prod Env) --------
