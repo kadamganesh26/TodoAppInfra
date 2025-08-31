@@ -22,6 +22,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5   # apni version set kar lena
+      # Login to Azure using single secret 
+      - name: Azure Login 
+        uses: azure/login@v2 
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Dev Environment for feature branches
       - name: Terraform Init (Dev)
