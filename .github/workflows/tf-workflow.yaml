@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'feature/*'
+      - main 
   pull_request:
     branches:
       - main
@@ -72,4 +73,3 @@ jobs:
       - name: Terraform Apply (Prod)
         working-directory: ./Env/Prod
         run: terraform apply -auto-approve
-        
