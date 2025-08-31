@@ -26,8 +26,11 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # -------Current Code Directory -----------
+      - name: Check current directory
+        run: pwd && ls -R
 
-            # -------- Feature Branch (Plan Only) --------
+      # -------- Feature Branch (Plan Only) --------
       - name: Terraform Init (Feature)
         if: startsWith(github.ref, 'refs/heads/feature/')
         working-directory: TodoAppInfra/Env/Dev
