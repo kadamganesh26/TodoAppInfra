@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - 'feature/*'
-      - main 
+      - main
   pull_request:
     branches:
       - main
@@ -12,8 +12,7 @@ on:
 jobs:
   terraform_plan:
     runs-on: self-hosted
-    
-
+    if: startsWith(github.ref, 'refs/heads/feature/')
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -21,36 +20,29 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.5   # apni version set kar liye
+          terraform_version: 1.7.5
 
-      # Login to Azure using single secret 
       - name: Azure Login 
         uses: azure/login@v2 
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-
-      # Dev Environment for feature branches
       - name: Terraform fmt (Dev)
-        if: startsWith(github.ref, 'refs/heads/feature/')
         working-directory: ./Env/Dev
         run: terraform fmt -check -recursive 
 
       - name: Terraform validate (Dev)
-        if: startsWith(github.ref, 'refs/heads/feature/')
         working-directory: ./Env/Dev
         run: terraform validate
 
       - name: Terraform Plan (Dev)
-        if: startsWith(github.ref, 'refs/heads/feature/')
         working-directory: ./Env/Dev
         run: terraform plan
 
 
-  # Step2: After PR Approval & Merge → Apply in Prod
   apply-prod:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event.pull_request.merged == true
+    if: github.ref == 'refs/heads/main'
     needs: terraform_plan
     environment:
       name: prod
