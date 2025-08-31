@@ -3,16 +3,14 @@ name: Terraform Workflow
 on:
   push:
     branches:
-      - main
       - 'feature/*'
   pull_request:
     branches:
       - main
-      - 'feature/*'
       
 jobs:
   terraform:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repo
@@ -21,31 +19,54 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.5   # apni version set kar lena
+          terraform_version: 1.7.5   # apni version set kar liye
+
       # Login to Azure using single secret 
       - name: Azure Login 
         uses: azure/login@v2 
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+
       # Dev Environment for feature branches
-      - name: Terraform Init (Dev)
+      - name: Terraform fmt (Dev)
         if: startsWith(github.ref, 'refs/heads/feature/')
         working-directory: ./Env/Dev
-        run: terraform init
+        run: terraform fmt -check -recursive 
+
+      - name: Terraform validate (Dev)
+        if: startsWith(github.ref, 'refs/heads/feature/')
+        working-directory: ./Env/Dev
+        run: terraform validate
 
       - name: Terraform Plan (Dev)
         if: startsWith(github.ref, 'refs/heads/feature/')
         working-directory: ./Env/Dev
         run: terraform plan
 
-      # Prod Environment for main branch
+
+  # Step2: After PR Approval & Merge → Apply in Prod
+  apply-prod:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Azure Login 
+        uses: azure/login@v2 
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Terraform Init (Prod)
-        if: github.ref == 'refs/heads/main'
         working-directory: ./Env/Prod
         run: terraform init
 
-      - name: Terraform Plan (Prod)
-        if: github.ref == 'refs/heads/main'
+      - name: Terraform Apply (Prod)
         working-directory: ./Env/Prod
-        run: terraform plan
+        run: terraform apply -auto-approve
