@@ -34,7 +34,6 @@ module "sql-server" {
   tags            = local.comman_tags
 }
 
-
 module "sql-db" {
   depends_on = [module.sql-server]
   source     = "../../Module/Azurerm_sql_database"
