@@ -26,11 +26,14 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./Env/Dev
 
       - name: Terraform Plan
         if: startsWith(github.ref, 'refs/heads/feature/')
         run: terraform plan
+        working-directory: ./Env/Dev
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: terraform apply -auto-approve
+        working-directory: ./Env/Dev
