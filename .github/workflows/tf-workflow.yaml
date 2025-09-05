@@ -30,7 +30,7 @@ jobs:
 
       - name: Terraform Plan
         if: startsWith(github.ref, 'refs/heads/feature/')
-        run: terraform plan
+        run: terraform plan -out terraform.tf
         working-directory: ./Env/Dev
 
       - name: Terraform Apply
