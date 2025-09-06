@@ -6,7 +6,8 @@ on:
       - main
   push:
     branches:
-      - main
+      - 'feature/*' # Run the workflow on the feature branch
+      - main        # Run the workflow for the Prod on man branch
 
 jobs:
   terraform_plan:
