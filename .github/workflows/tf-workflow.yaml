@@ -8,36 +8,31 @@ on:
   pull_request:
     branches:
       - main
-    
+
 jobs:
-  terraform_plan:
+  terraform_plan_dev:
     runs-on: self-hosted
     if: startsWith(github.ref, 'refs/heads/feature/')
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
 
-      - name: Azure Login 
-        uses: azure/login@v2 
-        with: 
+      - uses: azure/login@v2
+        with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-          
-      - name: Terraform init (Dev)
+      - name: Terraform Init (Dev)
         working-directory: ./Env/Dev
         run: terraform init  
 
-        
-      - name: Terraform fmt (Dev)
+      - name: Terraform Fmt (Dev)
         working-directory: ./Env/Dev
-        run: terraform fmt  
+        run: terraform fmt -check  
 
-      - name: Terraform validate (Dev)
+      - name: Terraform Validate (Dev)
         working-directory: ./Env/Dev
         run: terraform validate
 
@@ -45,32 +40,41 @@ jobs:
         working-directory: ./Env/Dev
         run: terraform plan
 
-
-  apply-prod:
+  terraform_plan_prod:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: terraform_plan
-    environment:
-      name: prod
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
-
-      - name: Azure Login 
-        uses: azure/login@v2 
-        with: 
+      - uses: azure/login@v2
+        with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-
       - name: Terraform Init (Prod)
         working-directory: ./Env/Prod
         run: terraform init
+      - name: Terraform Plan (Prod)
+        working-directory: ./Env/Prod
+        run: terraform plan
 
+  apply_prod:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: terraform_plan_prod
+    environment:
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Terraform Init (Prod)
+        working-directory: ./Env/Prod
+        run: terraform init
       - name: Terraform Apply (Prod)
         working-directory: ./Env/Prod
         run: terraform apply -auto-approve
