@@ -7,9 +7,9 @@ on:
   pull_request:
     branches:
       - main          # Run plan in Prod when PR is raised
-  push:
-    branches:
-      - main          # Apply in Prod only after merge
+  # push:
+  #   branches:
+  #     - main          # Apply in Prod only after merge
 
 jobs:
   # ---------------- DEV PLAN ----------------
